@@ -41,7 +41,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              widget.newsModel.title!,
+              widget.newsModel.title,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 15),
