@@ -1,9 +1,9 @@
 import 'package:final_project_tpm_prac/models/news_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// ignore: must_be_immutable
 class NewsDetailPage extends StatefulWidget {
   NewsModel newsModel;
   NewsDetailPage({
@@ -16,18 +16,19 @@ class NewsDetailPage extends StatefulWidget {
 }
 
 class _NewsDetailPageState extends State<NewsDetailPage> {
-  late String Date;
+  late String date;
 
   @override
   void initState() {
     super.initState();
-    Date = widget.newsModel.publishedAt!;
+    date = widget.newsModel.publishedAt!;
   }
 
   String changeDate(String date) {
     String newDate = date.substring(0, 10) + ' ' + date.substring(11, 19);
     return newDate;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,9 +46,12 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 15),
-            Text(DateFormat("EEEE, d MMMM y")
-                      .format(DateTime.parse(changeDate(Date))),
-                    style: TextStyle(color: Colors.grey),textAlign: TextAlign.left,),
+            Text(
+              DateFormat("EEEE, d MMMM y")
+                  .format(DateTime.parse(changeDate(date))),
+              style: TextStyle(color: Colors.grey),
+              textAlign: TextAlign.left,
+            ),
             SizedBox(height: 15),
             Image(image: NetworkImage(widget.newsModel.urlToImage!)),
             SizedBox(height: 15),

@@ -1,8 +1,10 @@
+import 'package:bcrypt/bcrypt.dart';
 import 'package:final_project_tpm_prac/views/homepage.dart';
 import 'package:final_project_tpm_prac/views/registerpage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helper/database_helper.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -11,7 +13,58 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  
   bool _isPasswordVisible = false;
+
+  loginInputHandler() {
+    bool isFilled = true;
+    if (usernameController.text == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Warning! Username can\'t empty',
+            textAlign: TextAlign.center,
+          ),
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      isFilled = false;
+    } else if (passwordController.text == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Warning! Password can\'t empty',
+            textAlign: TextAlign.center,
+          ),
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else if (passwordController.text.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Warning! Password less than 8 characters!',
+            textAlign: TextAlign.center,
+          ),
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      isFilled = false;
+    } 
+    return isFilled;
+  }
+
+  final formKey = GlobalKey<FormState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   children: [
                     TextField(
+                      controller: usernameController,
                       decoration: InputDecoration(
                         hintText: 'Username',
                         prefixIcon: Icon(Icons.people),
@@ -49,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                       height: 20,
                     ),
                     TextField(
+                      controller: passwordController,
                       decoration: InputDecoration(
                           hintText: 'Password',
                           prefixIcon: Icon(Icons.lock),
@@ -72,12 +127,40 @@ class _LoginPageState extends State<LoginPage> {
                         primary: Colors.black,
                         shadowColor: Colors.amber,
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomePage()));
-                      },
+                      onPressed: () async {
+                    
+                    if (loginInputHandler()) {
+                      final List<Map<String, dynamic>> result =
+                          await DatabaseHelper.instance
+                              .selectUser(usernameController.text);
+                      if (result.isNotEmpty) {
+                        final String hashedPassword = result[0]['password'];
+                        final bool isPasswordMatch = BCrypt.checkpw(
+                            passwordController.text, hashedPassword);
+                        if (isPasswordMatch) {
+                          final SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.setString('userId', usernameController.text);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Login Success',
+                                textAlign: TextAlign.center,
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                              width: 300,
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(),
+                          ),
+                        );
+                      }
+                    }
+                  },
                       child: Text('Login'),
                     ),
                     SizedBox(
