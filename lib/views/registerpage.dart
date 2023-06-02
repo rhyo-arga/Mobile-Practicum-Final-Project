@@ -1,6 +1,8 @@
+import 'package:bcrypt/bcrypt.dart';
 import 'package:final_project_tpm_prac/views/loginpage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../helper/database_helper.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -10,10 +12,46 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  bool _isPasswordVisible = false;
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController checkPasswordController = TextEditingController();
+  bool _isPasswordVisible1 = false;
+  bool _isPasswordVisible2 = false;
   void initState() {
     super.initState();
-    _isPasswordVisible = false;
+    _isPasswordVisible1 = false;
+    _isPasswordVisible2 = false;
+  }
+
+  regisHandler() {
+    bool isFilled = true;
+    if (usernameController.text == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Warning! Username can\'t empty!',
+            textAlign: TextAlign.center,
+          ),
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      isFilled = false;
+    } else if (passwordController.text == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Warning! Password can\'t empty!',
+            textAlign: TextAlign.center,
+          ),
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+    return isFilled;
   }
 
   @override
@@ -43,6 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 children: [
                   TextField(
+                    controller: usernameController,
                     decoration: InputDecoration(
                       hintText: 'Username',
                       prefixIcon: Icon(Icons.people),
@@ -52,41 +91,43 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 20,
                   ),
                   TextField(
+                    controller: passwordController,
                     decoration: InputDecoration(
                       hintText: 'Password',
                       prefixIcon: Icon(Icons.lock),
                       suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
+                            _isPasswordVisible1 = !_isPasswordVisible1;
                           });
                         },
-                        icon: Icon(_isPasswordVisible
+                        icon: Icon(_isPasswordVisible1
                             ? Icons.visibility
                             : Icons.visibility_off),
                       )
                     ),
-                    obscureText: !_isPasswordVisible,
+                    obscureText: !_isPasswordVisible1,
                   ),
                   SizedBox(
                     height: 20,
                   ),
                   TextField(
+                    controller: checkPasswordController,
                     decoration: InputDecoration(
                       hintText: 'Check Password',
                       prefixIcon: Icon(Icons.lock),
                       suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
+                            _isPasswordVisible2 = !_isPasswordVisible2;
                           });
                         },
-                        icon: Icon(_isPasswordVisible
+                        icon: Icon(_isPasswordVisible2
                             ? Icons.visibility
                             : Icons.visibility_off),
                       )
                     ),
-                    obscureText: !_isPasswordVisible,
+                    obscureText: !_isPasswordVisible2,
                   ),
                   SizedBox(
                     height: 20,
@@ -96,10 +137,48 @@ class _RegisterPageState extends State<RegisterPage> {
                       primary: Colors.black,
                       shadowColor: Colors.amber,
                     ),
-                    onPressed: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginPage()));
-                    },
+                    onPressed: () async {
+                      if (regisHandler()) {
+                      final String hashedPassword = BCrypt.hashpw(
+                          passwordController.text, BCrypt.gensalt());
+                      final int result =
+                          await DatabaseHelper.instance.insertUser({
+                        'username': usernameController.text,
+                        'password': hashedPassword,
+                      });
+                      if (result > 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Register Success',
+                              textAlign: TextAlign.center,
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            width: 300,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Register Failed',
+                              textAlign: TextAlign.center,
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            width: 300,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    }
+              },
                     child: Text('Register'),
                   ),
                   SizedBox(
