@@ -31,6 +31,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Uri _url = Uri.parse(widget.newsModel.url);
     return Scaffold(
       appBar: AppBar(
         title: Text('News'),
@@ -63,11 +64,8 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
             ),
             TextButton(
               onPressed: () async {
-                String url = widget.newsModel.url;
-                if (await canLaunch(url)) {
-                  await launch(url);
-                } else {
-                  throw 'Could not launch $url';
+                if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+                  throw 'Could not launch $_url';
                 }
               },
               child: Text('Read More'),

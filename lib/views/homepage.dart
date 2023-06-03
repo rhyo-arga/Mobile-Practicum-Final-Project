@@ -12,7 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   int _selectedIndex = 0;
 
   static List<Widget> _widgetOptions = <Widget>[
@@ -27,7 +26,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
@@ -59,7 +58,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Home_Page extends StatefulWidget {
-  const Home_Page({ Key? key }) : super(key: key);
+  const Home_Page({Key? key}) : super(key: key);
 
   @override
   State<Home_Page> createState() => _Home_PageState();
@@ -68,9 +67,9 @@ class Home_Page extends StatefulWidget {
 class _Home_PageState extends State<Home_Page> {
   @override
   Widget build(BuildContext context) {
-        return Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: Text('News'),
+        title: Text('Top Headlines'),
         backgroundColor: Colors.black,
       ),
       body: FutureBuilder(
@@ -95,27 +94,32 @@ class _Home_PageState extends State<Home_Page> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            child: Image.network(snapshot.data[index].urlToImage,
-                            width: 225,
-                            height: 115,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                              Container(
+                            child: Image.network(
+                              snapshot.data[index].urlToImage,
+                              width: 160,
+                              height: 110,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
                                 width: 225,
                                 height: 115,
-                                child: const Icon(Icons.error,
-                                size: 100,),
-                              ),),
+                                child: const Icon(
+                                  Icons.error,
+                                  size: 100,
+                                ),
+                              ),
                             ),
+                          ),
                           Expanded(
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                left: 7, right: 7, top: 10
-                              ),child: Text(snapshot.data[index].title,
-                              style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15
-                                ),)))
+                              child: Container(
+                                  padding: EdgeInsets.only(
+                                      left: 7, right: 7, top: 10),
+                                  child: Text(
+                                    snapshot.data[index].title,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                  )))
                         ],
                       ),
                       onTap: () {
@@ -139,5 +143,5 @@ class _Home_PageState extends State<Home_Page> {
         },
       ),
     );
-    }
+  }
 }

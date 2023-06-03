@@ -74,14 +74,14 @@ class _SearchPageState extends State<SearchPage> {
                                 Container(
                                   child: Image.network(
                                     snapshot.data[index].urlToImage,
-                                    width: 225,
-                                    height: 115,
+                                    width: 160,
+                                    height: 110,
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             Container(
-                                      width: 225,
-                                      height: 115,
+                                      width: 160,
+                                      height: 110,
                                       child: const Icon(
                                         Icons.error,
                                         size: 100,
