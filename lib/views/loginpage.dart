@@ -15,7 +15,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  
+
   bool _isPasswordVisible = false;
 
   loginInputHandler() {
@@ -58,13 +58,12 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
       isFilled = false;
-    } 
+    }
     return isFilled;
   }
 
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
 
   @override
   Widget build(BuildContext context) {
@@ -128,39 +127,40 @@ class _LoginPageState extends State<LoginPage> {
                         shadowColor: Colors.amber,
                       ),
                       onPressed: () async {
-                    
-                    if (loginInputHandler()) {
-                      final List<Map<String, dynamic>> result =
-                          await DatabaseHelper.instance
-                              .selectUser(usernameController.text);
-                      if (result.isNotEmpty) {
-                        final String hashedPassword = result[0]['password'];
-                        final bool isPasswordMatch = BCrypt.checkpw(
-                            passwordController.text, hashedPassword);
-                        if (isPasswordMatch) {
-                          final SharedPreferences prefs = await SharedPreferences.getInstance();
-                          prefs.setString('userId', usernameController.text);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Login Success',
-                                textAlign: TextAlign.center,
+                        if (loginInputHandler()) {
+                          final List<Map<String, dynamic>> result =
+                              await DatabaseHelper.instance
+                                  .selectUser(usernameController.text);
+                          if (result.isNotEmpty) {
+                            final String hashedPassword = result[0]['password'];
+                            final bool isPasswordMatch = BCrypt.checkpw(
+                                passwordController.text, hashedPassword);
+                            if (isPasswordMatch) {
+                              final SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              prefs.setString(
+                                  'userId', usernameController.text);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Login Success',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  behavior: SnackBarBehavior.floating,
+                                  width: 300,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
                               ),
-                              behavior: SnackBarBehavior.floating,
-                              width: 300,
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
+                            );
+                          }
                         }
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomePage(),
-                          ),
-                        );
-                      }
-                    }
-                  },
+                      },
                       child: Text('Login'),
                     ),
                     SizedBox(

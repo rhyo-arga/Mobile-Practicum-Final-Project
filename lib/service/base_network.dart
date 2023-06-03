@@ -9,12 +9,12 @@ class BaseNetwork {
 
   Future getNewsUS() async {
     Uri url = Uri.parse('${baseUrl}top-headlines?country=us&apikey=$apiKey');
-    
+
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
       return data['articles'].map((json) => NewsModel.fromJson(json)).toList();
-    } 
+    }
   }
 
   Future getNewsSearch(String query) async {
